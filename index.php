@@ -38,6 +38,7 @@ tbody tr			{ color: gray; }
 <h2>Enter your daily calorie intake and weight to calculate your BMR and forecast future weight loss or gain.</h2>
 <?php
 if (isset($_SESSION["valid"]) && $_SESSION["valid"] === 1) {
+	echo "<p>Logged in as {$_SESSION['username']}. <a href='logout.php'>Log out</a></p>";
 } else {
 	echo "<p><a href='login.php'>Log in or register</a> to save your data.</p>";
 }
@@ -48,7 +49,7 @@ if (isset($_SESSION["valid"]) && $_SESSION["valid"] === 1) {
 
 <?php
 if (isset($_SESSION["valid"]) && $_SESSION["valid"] === 1)
-	draw_table_chart(-1, 40);
+	draw_table_chart(-2, 100);
 ?>
 <nav>
  <a href="faq.html">Questions</a>

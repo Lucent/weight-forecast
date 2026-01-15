@@ -1,0 +1,89 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+h1		{ text-decoration: underline; }
+body	{ font-family: sans-serif; background-color: #EEE; }
+input	{ display: block; margin-left: 1em; }
+input[type="submit"]	{ margin: 1rem; padding: 0.5em; font-size: x-large; border-radius: 0.5rem; background-color: lightblue; background: linear-gradient(to right, white, #66F); background-size: 400% 400%; }
+input[type="submit"][animate="true"]	{ animation: gradient 1s ease infinite; }
+@keyframes gradient {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+</style>
+</head>
+<body>
+<h1>Isoleucine from USDA database</h1>
+<form action="result.php" method="POST" id="GradeForm">
+  <h2>Food</h2>
+  <input type="search" name="search">
+  <input type="submit" value="Calculate Isoleucine in 2000 calories">
+</form>
+<h3>Checking <span id="Current">0</span> of <span id="Total">0</span> found foods for isoleucine</h3>
+  <h2>Isoleucine Content</h2>
+  <table id="Results" border=1 cellspacing=5 cellpadding=2>
+  <thead><tr><th>Food</th><th>g/2000 kcal</th></tr></thead>
+  <tbody></tbody>
+  </table>
+<script>
+function add_row(content) {
+	const upcount = parseInt(document.getElementById("Current").textContent);
+	document.getElementById("Current").textContent = upcount + 1;
+
+	const no_data = /^NO_DATA_FOR_FOOD/;
+	if (content.match(no_data))
+		return;
+
+	const table = document.getElementById("Results");
+	const row = table.insertRow(-1);
+	const cellContent = content.split("|");
+	const cell1 = row.insertCell(0);
+	cell1.textContent = cellContent[0];
+	const cell2 = row.insertCell(1);
+	cell2.textContent = cellContent[1];
+}
+
+function updateTotalValue(line) {
+	const totalRegExp = /TOTAL=(\d*)/;
+	const match = line.match(totalRegExp);
+
+	if (match && match[1]) {
+		const total = parseInt(match[1], 10);
+		document.getElementById("Total").innerText = total;
+		return true;
+	}
+}
+
+const grade_form = document.getElementById("GradeForm");
+grade_form.addEventListener("submit", async (event) => {
+	document.getElementById("Current").textContent = 0;
+	document.getElementById("Total").textContent = 0;
+
+	const submit_button = document.querySelector("input[type='submit']");
+	event.preventDefault();
+	const searchTerm = event.target.elements.search.value;
+	submit_button.setAttribute("animate", "true");
+
+	const xhr = new XMLHttpRequest();
+	xhr.open("GET", `result.php?search=${searchTerm}`, true);
+	xhr.onprogress = function (event) {
+		const lines = xhr.responseText.split("\n");
+		const lastLine = lines[lines.length - 2];
+		if (!updateTotalValue(lastLine))
+			add_row(lastLine);
+	};
+
+	xhr.onload = function() {
+		if (xhr.status === 200)
+			submit_button.setAttribute("animate", "false");
+		else
+			console.error(`Error: ${xhr.statusText}`);
+	};
+
+	xhr.send();
+});
+</script>
+</body>
+</html>

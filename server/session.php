@@ -3,16 +3,11 @@ session_set_cookie_params(31536000);
 session_start([
 	"cookie_lifetime" => 60 * 60 * 24 * 365
 ]);
-include "db_password.php";
 
 function database_connect() {
-	global $dbpass;
-	$dbhost = "localhost";
-	$dbname = "fitcast";
-	$dbuser = "fitcast";
-	$conn = mysqli_connect($dbhost, $dbuser, $dbpass);
+	$conn = mysqli_connect(getenv('DB_HOST'), getenv('DB_USER'), getenv('DB_PASS'));
 	$conn->set_charset("utf8");
-	mysqli_select_db($conn, $dbname);
+	mysqli_select_db($conn, getenv('DB_NAME'));
 	return $conn;
 }
 
@@ -46,10 +41,12 @@ function register($email, $password) {
 
 	$conn = database_connect();
 	$user = mysqli_real_escape_string($conn, $email);
-	$query = "INSERT INTO users (username, email, password) VALUES ('$email', '$email', '$password_hash');";
+	$query = "INSERT INTO users (username, email, password) VALUES ('$user', '$user', '$password_hash');";
 	mysqli_query($conn, $query);
 	echo $conn->error;
+	$id = mysqli_insert_id($conn);
 	mysqli_close($conn);
+	return array("id" => $id, "username" => $email);
 }
 
 function draw_login_register($legend, $username, $password, $submittype) {

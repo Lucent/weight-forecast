@@ -1,0 +1,38 @@
+services:
+  app:
+    build: .
+    container_name: fitcast-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+
+  db:
+    image: mysql:latest
+    container_name: fitcast-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db-dump:/docker-entrypoint-initdb.d
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: fitcast-tunnel
+    restart: unless-stopped
+    depends_on:
+      - app
+    command: tunnel run --token ${TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+
+volumes:
+  db_data:

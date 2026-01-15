@@ -59,7 +59,7 @@ function draw_table_chart($start = -7, $end = 21) {
 			$weight = $intake_array[$weight_today]["weight"];
 		else
 			$weight = "";
-		echo " <tr class='{$weekday} {$today}' id='${date_string}'><th>{$weekday} {$month_day}</th><td><input type='number' name='Intake-{$date_string}' min='0' max='10000' value='{$intake}'></td><td><output></output></td><td><input type='number' name='Weight-{$date_string}' min='50' max='1000' value='{$weight}' step='0.1'></td><td><output></output></td></tr>\n";
+		echo " <tr class='{$weekday} {$today}' id='{$date_string}'><th>{$weekday} {$month_day}</th><td><input type='number' name='Intake-{$date_string}' min='0' max='10000' value='{$intake}'></td><td><output></output></td><td><input type='number' name='Weight-{$date_string}' min='50' max='1000' value='{$weight}' step='0.1'></td><td><output></output></td></tr>\n";
 	}
 	echo "</tbody>\n";
 	echo "</table>\n";
